@@ -2,7 +2,7 @@ A simple image scraping script.
 
 To run:
 1. Open terminal in the same folder as the scrypt (or mention the absolute path to the script in step 2.)
-2. Type 'python imgscrape.py' and press the magic button.
+2. Type 'python3 imgscrape.py' and press the magic button.
 
 
 Works on:
