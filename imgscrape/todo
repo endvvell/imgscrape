@@ -1,1 +1,2 @@
-* Add 'Would you like to re-run with trailing '/' at the end of URL' option if first scrape fails.
+* Add "Would you like to re-run with trailing '/' at the end of URL" option if first scrape fails.
+* Add "recursive search" option to give an option of going into found subpages (if present, give the depth of a 'dive'(with the option of specifying how deep to dive and the amount of possible downloads)).
