@@ -100,5 +100,5 @@ while(True):
     try:
         imgScrape(userI)  
     except:
-        print("Sorry, something went wrong or the script got interrupted. Please make sure URL is spelled correctly. Try adding a trailing '/' to the end of your URL.")
+        print("Sorry, something went wrong or the script got interrupted. Please make sure URL is spelled correctly.")
     break
