@@ -1,3 +1,0 @@
-* Add "Would you like to re-run with trailing '/' at the end of URL" option if first scrape fails.
-* Check for website base folder, program the script to act accordingly.
-* Make this an extension for browsers?
