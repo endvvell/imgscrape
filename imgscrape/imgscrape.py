@@ -1,76 +1,89 @@
 #!/usr/bin/env python3
-import bs4, requests, os, sys
-
-from requests.api import request
+import bs4, requests, os, sys, re
 
 def imgScrape(url):
-    userUrl = requests.get(url) # get requested page
-
-    if userUrl.status_code == 200: # check if request was successful
+# get requested page
+    userUrl = requests.get(url)
+    if userUrl.status_code == 200:   # check if request was successful
         imgGet = bs4.BeautifulSoup(userUrl.text, "html.parser")
-        imgElem = imgGet.find_all("img",{"src":True}) # get elements from the parsed page
+        imgElem = imgGet.find_all("img",{"src":True})   # get elements from the parsed page
 
-        if (len(imgElem) != 0): # check if anything was found
+# check if anything was found
+        if (len(imgElem) != 0):
             imgList = []
-            for x in imgElem:
-                if ("." in (x['src'])): # check if found files are suitable
-                    imgList.append(x['src']) # put found items in a list
+            for x in imgElem:   # check if found files are of suitable format
+                if ("." in (x['src'])):
+                    imgList.append(x['src'])   # put found items in a list
             if not imgList:
                 print("Found some image files, but none of suitable format. Website might be blocking scraping attempts.")
             else:
                 print("Found following files:")
                 print(";\n".join(imgList), "\n")
 
-                if not os.path.exists("./imgFiles"): # create folder for found files
+# create folder for found files
+                if not os.path.exists("./imgFiles"):
                     os.makedirs("imgFiles")
                 os.chdir("./imgFiles")
-#
-                # find and write files to folder
-                def writeFiles(IMG, URL):
-                    # trying to guess full path to image
+
+# find and write files to folder - function
+                def fwFiles(IMGS, URL):
+    # trying to find correct path to image
                     def tryingFunc(PATH):
+        # write binary image data to file - function
+                        def writeFunc(PATH):
+                                with open("img" + str(PATH).replace("/", "-"), "wb") as imgSave:    #open stream
+                                    print(f"{imgWeb} - Success")    # progress confirmation
+                                    imgSave.write(imgWeb.content)   # write to the stream in binary (wb)
+                                    
                         imgWeb = requests.get(PATH)
                         print(f"Trying : {PATH}", end=" - ")
                         if imgWeb.status_code == 200:
-                            with open("img" + str(PATH).replace("/", "-"), "wb") as imgSave: #open stream
-                                print(f"{imgWeb} - Success") # progress confirmation
-                                imgSave.write(imgWeb.content) # write to the stream in binary (wb)
-                        elif imgWeb.status_code == 404: # re-trying assuming domain to be base
+                            writeFunc(PATH)
+                        elif imgWeb.status_code == 404: # re-trying assuming domain to be root
                             print(f"{imgWeb} - Failed (Wrong Path)")
                             rURL = (str(URL).split("/",3))[:-1]
-                            rURL = "/".join(rURL) + "/"
-                            imgWeb = requests.get(rURL + IMG[e])
-                            print(f"*Again : {rURL + IMG[e]}", end=" - ")
+                            rURL = "/".join(rURL)
+                            try:    # in case previously added trailing "/" was removed from URL by the code above and image path doesn't start with "/"
+                                imgWeb = requests.get(rURL + IMGS[e])
+                            except:
+                                rURL = rURL + "/"
+                                imgWeb = requests.get(rURL + IMGS[e])
+                            print(f"*Again : {rURL + IMGS[e]}", end=" - ")
                             if imgWeb.status_code == 200:
-                                with open("img" + str(PATH).replace("/", "-"), "wb") as imgSave:
-                                    print(f"{imgWeb} - Success\n")
-                                    imgSave.write(imgWeb.content)
-                            elif imgWeb.status_code == 404:
-                                print(f"{imgWeb} - Failed (Wrong Path)\n")
+                                writeFunc(PATH)
                             else:
                                 print(f"{imgWeb} - Failed\n")
-                        else: # all attempts failed - proceeding to next
-                            print(f"{imgWeb} - Failed")
-#
-                    for e in range(len(IMG)):
-                        if (str(IMG[e]).startswith("http")):
-                            tryingFunc(IMG[e])
-                        elif (".html" in URL) or (".php" in URL):
-                            URL = (str(URL).split("/"))[:-1]
-                            URL = "/".join(URL) + "/"
-                        elif (str(IMG[e]).startswith(".")):
-                            IMG[e] = str(IMG[e])[1:]
-                            tryingFunc(URL + IMG[e])
                         else:
-                            tryingFunc(URL + IMG[e])
-#                            
+                            print(f"{imgWeb} - Failed\n")
+
+                    for e in range(len(IMGS)):  # additional filters for the code above
+                        slashDupe = re.findall(r"(/{2,})", IMGS[e]) #   if the image is on sub-domain: remove preceding slashes
+                        if (str(IMGS[e]).startswith("http")):
+                            tryingFunc(IMGS[e])
+                        elif (".html" in URL) or (".php" in URL):
+                            URL = (str(URL).split("/"))
+                            URL = "/".join(URL) + "/"
+                            if (str(IMGS[e]).startswith(".")):
+                                IMGS[e] = str(IMGS[e])[1:]
+                                tryingFunc(URL + IMGS[e])
+                        elif (str(IMGS[e]).startswith(".")):
+                            IMGS[e] = str(IMGS[e])[1:]
+                            tryingFunc(URL + IMGS[e])
+                        elif len(slashDupe) > 0:
+                            if str(IMGS[e]).startswith(slashDupe[0]):
+                                imglen = len(IMGS[e]) - len(slashDupe[0])
+                                IMGS[e] = IMGS[e][-imglen:]
+                                tryingFunc(("http://" + IMGS[e]))
+                        else:
+                            tryingFunc(URL + IMGS[e])
+
                 print("Progress:")
                 try:
-                    writeFiles(imgList, url)
+                    fwFiles(imgList, url)
                 except:
-                    print("* Issue with URL, trying with added trailing \"/\"...")
+                    print("* Issue with image URL, trying with added \"/\"...")
                     url = url + "/"
-                    writeFiles(imgList, url)
+                    fwFiles(imgList, url)
                 print("\nDone.\n")
         else:
             print("Found no files to download. Website might be blocking scraping attempts.")
@@ -80,11 +93,12 @@ def imgScrape(url):
         print(f"Request was not successful - Error code: {userUrl.status_code}")
 
 
+# get user input, adjust if needed
 while(True):
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1:   #adding ability to pass URL as an argument to the script
         userI = sys.argv[1]
     else:
-        userI = input("Please enter a url to scrape for images: ")
+        userI = input("Please enter a URL to scrape for images: ")
         userI = userI.strip()
 
     # check if protocol is mentioned in the url for parser to work
@@ -96,9 +110,10 @@ while(True):
     print("\nWebpage to scrape:")
     print(userI, "\n")
 
+
     # Showtime!
     try:
-        imgScrape(userI)  
+        imgScrape(userI)
     except:
         print("Sorry, something went wrong or the script got interrupted. Please make sure URL is spelled correctly.")
     break
