@@ -19,5 +19,3 @@ To run:
 
 
 All scraped files can be found in 'imgFiles' folder, which will get created in the parent folder if it doesn't already exist.
-
-!['showcase'](https://imgur.com/a/g20xvrE)
