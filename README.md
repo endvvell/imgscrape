@@ -20,4 +20,4 @@ To run:
 
 All scraped files can be found in 'imgFiles' folder, which will get created in the parent folder if it doesn't already exist.
 
-![](https://github.com/svitan0k/ImgScrape/blob/main/showcase.webm)
+![](https://imgur.com/1rFVzHz)
