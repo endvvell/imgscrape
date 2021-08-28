@@ -33,7 +33,7 @@ def imgScrape(url):
                         def writeFunc(PATH):
                                 with open("img" + str(PATH).replace("/", "-"), "wb") as imgSave:    #open stream
                                     print(f"{imgWeb} - Success")    # progress confirmation
-                                    imgSave.write(imgWeb.content)   # write to the stream in binary (wb)
+                                    imgSave.write(imgWeb.content)   # write to the stream
                                     
                         imgWeb = requests.get(PATH)
                         print(f"Trying : {PATH}", end=" - ")
