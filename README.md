@@ -20,5 +20,5 @@ To run:
 
 All scraped files can be found in 'imgFiles' folder, which will get created in the parent folder if it doesn't already exist.
 
+https://user-images.githubusercontent.com/34137807/131502729-7e7bdf5a-6942-4be8-b94a-c48813d52d4e.mov
 
-https://user-images.githubusercontent.com/34137807/131264571-39c2d114-a627-4349-831a-1a7463a1d384.mp4
