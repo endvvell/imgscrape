@@ -9,12 +9,13 @@ Works on:
 Usage:
 (with an argument):
 - python3 imgscrape.py 'your_url_here'
+
 (or without):
 - python3 imgscrape.py
 
 
 To run:
-1. Open terminal in the same folder as the scrypt. (or mention the absolute path to the script in step 2)
+1. Open terminal in the same folder as the script. (or mention the absolute path to the script in step 2)
 2. Type 'python3 imgscrape.py' and press the magic button.
 
 
